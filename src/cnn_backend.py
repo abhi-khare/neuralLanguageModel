@@ -8,7 +8,7 @@ class CharacterCNNBackend():
         self.kernel_features = kernel_features
         
         # Initialize embeddings
-        self.embeddings = tf.get_variable('py', [self.vocab_size, self.embedding_dim])
+        self.embeddings = tf.get_variable('embeddings', [self.vocab_size, self.embedding_dim])
         
         # Clear operation for 0th embedding
         self.reset_op = tf.scatter_update(self.embeddings, [0], tf.constant(0.0, shape=[1, self.embedding_dim]))

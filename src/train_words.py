@@ -39,7 +39,8 @@ keep_prob = tf.placeholder(tf.float32)
 # Model
 embedder = WordEmbeddingBackend(vocab_size, embedding_dim)
 network = Network(input_, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length, embedder)
-network.logits
+loss = network.loss
+train_op = network.train_op
 
 # Create session    
 config = tf.ConfigProto()

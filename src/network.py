@@ -24,6 +24,18 @@ class Network():
         self.num_layers = num_layers
         self.hidden_dim = hidden_dim
         
+        # Initialize variables
+        self.initialize_variables()
+        
+    def initialize_variables(self):
+        # For the optimizer
+        self.learning_rate = tf.Variable(Network.INITIAL_LR, trainable=False, name='learning_rate')
+        self.global_step = tf.Variable(0, name='global_step', trainable=False)
+        
+        # Output Projection
+        self._output_W = tf.get_variable('outW', shape=[self.hidden_dim, self.vocab_size])
+        self._output_b = tf.get_variable('outB', shape=[self.vocab_size])
+        
     @LazyProperty
     def logits(self):
         # LSTM
@@ -53,14 +65,10 @@ class Network():
         # Retrieve the result
         self.rnn_outputs, self.rnn_final_state = tf.contrib.rnn.static_rnn(cell, rnn_inputs, self.initial_state)
         
-        # Output Projection
-        output_W = tf.get_variable('outW', shape=[self.hidden_dim, self.vocab_size])
-        output_b = tf.get_variable('outB', shape=[self.vocab_size])
-        
         logits = []
         
         for output in self.rnn_outputs:
-            logits += [ tf.matmul(output, output_W) + output_b ]
+            logits += [ tf.matmul(output, self._output_W) + self._output_b ]
             
         return logits    
     
@@ -70,11 +78,7 @@ class Network():
         return tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=labels))
     
     @LazyProperty
-    def train_op(self):        
-        # SGD learning parameter
-        self.learning_rate = tf.Variable(Network.INITIAL_LR, trainable=False, name='learning_rate')
-        self.global_step = tf.Variable(0, name='global_step', trainable=False)
-            
+    def train_op(self):            
         # collect all trainable variables and clip gradients
         tvars = tf.trainable_variables()
         grads, self.global_norm = tf.clip_by_global_norm(tf.gradients(self.loss * self.sequence_length, tvars), Network.MAX_GRAD_NORM)

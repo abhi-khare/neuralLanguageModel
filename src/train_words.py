@@ -38,7 +38,8 @@ keep_prob = tf.placeholder(tf.float32)
 
 # Model
 embedder = WordEmbeddingBackend(vocab_size, embedding_dim)
-network = Network(input_, targets, keep_prob, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length)
+network = Network(input_, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length, embedder)
+network.logits
 
 # Create session    
 config = tf.ConfigProto()
@@ -68,7 +69,7 @@ for epoch in range(25):
         t_loss, _, rnn_state, gradient_norm, step, _ = session.run([
             network.loss,
             network.train_op,
-            network.final_rnn_state,
+            network.rnn_final_state,
             network.global_norm,
             network.global_step,
             embedder.reset_op
@@ -103,7 +104,7 @@ for epoch in range(25):
 
         t_loss, rnn_state = session.run([
             network.loss,
-            network.final_rnn_state
+            network.rnn_final_state
         ], {
             input_ : valid_x[i:i+batch_size],
             targets: valid_y[i:i+batch_size],

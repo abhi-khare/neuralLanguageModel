@@ -4,7 +4,7 @@ import time
 from english_provider import EnglishDataProvider
 from network import Network
 from utils import model_size
-from word_embedding import WordEmbeddingBackend
+from word_embedding_backend import WordEmbeddingBackend
 
 # Training
 dropout       = 0.5

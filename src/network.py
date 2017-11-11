@@ -27,6 +27,9 @@ class Network():
         # Initialize variables
         self.initialize_variables()
         
+        # Initialize logits
+        self.logits()
+        
     def initialize_variables(self):
         # For the optimizer
         self.learning_rate = tf.Variable(Network.INITIAL_LR, trainable=False, name='learning_rate')
@@ -36,16 +39,14 @@ class Network():
         self._output_W = tf.get_variable('outW', shape=[self.hidden_dim, self.vocab_size])
         self._output_b = tf.get_variable('outB', shape=[self.vocab_size])
         
-    @LazyProperty
-    def logits(self):
-        # LSTM
+        # LSTM cell
         if self.num_layers == 1:
-            cell = tf.nn.rnn_cell.DropoutWrapper(
+            self._cell = tf.nn.rnn_cell.DropoutWrapper(
                     tf.nn.rnn_cell.BasicLSTMCell(self.hidden_dim, state_is_tuple=True, forget_bias=0.0),
                     output_keep_prob=self.keep_prob
                    )
         else:
-            cell = tf.nn.rnn_cell.MultiRNNCell([
+            self._cell = tf.nn.rnn_cell.MultiRNNCell([
                         tf.nn.rnn_cell.DropoutWrapper(
                             tf.nn.rnn_cell.BasicLSTMCell(self.hidden_dim, state_is_tuple=True, forget_bias=0.0),
                             output_keep_prob=self.keep_prob
@@ -53,8 +54,12 @@ class Network():
                         for _ in range(self.num_layers)
                     ])
         
-        self.initial_state = cell.zero_state(self.batch_size, dtype=tf.float32)
+    @LazyProperty
+    def initial_state(self):
+        return self._cell.zero_state(self.batch_size, dtype=tf.float32)
         
+    @LazyProperty
+    def logits(self):
         # Invoke embed operation
         input_embedded = self.embedder.embed_word(self.inputs)
         
@@ -63,7 +68,7 @@ class Network():
         rnn_inputs = [tf.squeeze(x, [1]) for x in tf.split(rnn_inputs, self.sequence_length, 1)]
         
         # Retrieve the result
-        self.rnn_outputs, self.rnn_final_state = tf.contrib.rnn.static_rnn(cell, rnn_inputs, self.initial_state)
+        self.rnn_outputs, self.rnn_final_state = tf.contrib.rnn.static_rnn(self._cell, rnn_inputs, self.initial_state)
         
         logits = []
         

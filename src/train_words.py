@@ -39,8 +39,6 @@ keep_prob = tf.placeholder(tf.float32)
 # Model
 embedder = WordEmbeddingBackend(vocab_size, embedding_dim)
 network = Network(input_, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length, embedder)
-loss = network.loss
-train_op = network.train_op
 
 # Create session    
 config = tf.ConfigProto()
@@ -51,7 +49,6 @@ session = tf.Session(config=config)
 session.run(tf.global_variables_initializer())
 session.run(embedder.reset_op)
 print 'Model size:', model_size()
-
 
 best_valid_loss = None
 rnn_state = session.run(network.initial_state)

@@ -4,7 +4,6 @@ import time
 from english_provider import EnglishDataProvider
 from network import Network
 from utils import model_size
-from word_embedding_backend import WordEmbeddingBackend
 from cnn_backend import CharacterCNNBackend
 
 # Training

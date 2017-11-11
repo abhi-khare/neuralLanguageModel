@@ -5,6 +5,7 @@ from english_provider import EnglishDataProvider
 from network import Network
 from utils import model_size
 from word_embedding_backend import WordEmbeddingBackend
+from cnn_backend import CharacterCNNBackend
 
 # Training
 dropout       = 0.5
@@ -19,25 +20,31 @@ num_layers    = 2
 
 # Dataset
 eigo = EnglishDataProvider()
-my_x, my_y = eigo.get_word_pairs('train')
 
 vocab_size = len(eigo.get_vocabulary())
 print 'Vocabulary size:', vocab_size
 
-train_x, train_y = eigo.get_word_pairs('train')
-valid_x, valid_y = eigo.get_word_pairs('valid')
-test_x , test_y  = eigo.get_word_pairs('test')
+train_x, _ = eigo.get_char_pairs('train')
+valid_x, _ = eigo.get_char_pairs('valid')
+test_x , _ = eigo.get_char_pairs('test')
+
+_, train_y = eigo.get_word_pairs('train')
+_, valid_y = eigo.get_word_pairs('valid')
+_, test_y  = eigo.get_word_pairs('test')
 
 input_seq_length = len(train_x[0])
 print 'Sequence length:', input_seq_length
 
+max_word_length = len(train_x[0][0])
+print 'Maximum word length:', max_word_length
+
 # Placeholders
-input_ = tf.placeholder(tf.int32, shape=[batch_size, input_seq_length], name="input")
+input_ = tf.placeholder(tf.int32, shape=[batch_size, input_seq_length, max_word_length], name="input")
 targets = tf.placeholder(tf.int64, [batch_size, input_seq_length], name='targets')
 keep_prob = tf.placeholder(tf.float32)
 
 # Model
-embedder = WordEmbeddingBackend(vocab_size, embedding_dim)
+embedder = CharacterCNNBackend(vocab_size, embedding_dim)
 network = Network(input_, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length, embedder)
 
 # Create session    

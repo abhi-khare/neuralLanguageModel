@@ -15,13 +15,20 @@ class CharacterCNNBackend():
     
     def embed_word(self, inputs):
         max_word_length = inputs.get_shape()[1]
-        inputs = tf.expand_dims(inputs, 1)
+        input_embedded = tf.nn.embedding_lookup(self.embeddings, inputs)
+        input_embedded = tf.reshape(input_embedded, [-1, max_word_length, self.embedding_dim])
+        input_embedded = tf.expand_dims(input_embedded, 1)
         
         layers = []
         
         for kernel_size, kernel_feature_size in zip(self.kernels, self.kernel_features):
             reduced_length = max_word_length - kernel_size + 1
-            conv = tf.nn.conv2d(inputs, kernel_feature_size, 1, kernel_size, name="kernel_%d" % kernel_size)
+            
+            with tf.variable_scope("kernel_%d" % kernel_size):
+                w = tf.get_variable('w', [1, kernel_size, input_embedded.get_shape()[-1], kernel_feature_size])
+                b = tf.get_variable('b', [kernel_feature_size])
+            
+            conv = tf.nn.conv2d(input_embedded, w, strides=[1, 1, 1, 1], padding='VALID') + b
             pool = tf.nn.max_pool(tf.tanh(conv), [1, 1, reduced_length, 1], [1, 1, 1, 1], 'VALID')
             layers.append(tf.squeeze(pool, [1, 2]))
         

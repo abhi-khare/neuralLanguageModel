@@ -1,12 +1,14 @@
 import tensorflow as tf
+import numpy as np
 
 class CharacterCNNBackend():
-    def __init__(self, vocab_size, embedding_dim, max_word_length, kernels=[1,2,3,4,5,6], kernel_features = [25,50,75,100,125,150]):
+    def __init__(self, vocab_size, embedding_dim, max_word_length, kernels=[1,2,3,4,5,6], kernel_features = [25,50,75,100,125,150], highway_layers=1):
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.max_word_length = max_word_length
         self.kernels = kernels
         self.kernel_features = kernel_features
+        self.highway_layers = highway_layers
         
         # Initialize embeddings
         self.embeddings = tf.get_variable('embeddings', [self.vocab_size, self.embedding_dim])
@@ -33,7 +35,27 @@ class CharacterCNNBackend():
             layers.append(tf.squeeze(pool, [1, 2]))
         
         if len(layers) > 1:
-            return tf.concat(layers, 1)
+            output = tf.concat(layers, 1)
         else:
-            return layers[0]
+            output = layers[0]
+        
+        highway_stack = [output]
+        
+        for i in range(self.highway_layers):
+            with tf.variable_scope("highway_%d" % i):
+                dim = np.sum(self.kernel_features)
+                
+                f_w = tf.get_variable('f_w', [dim, dim])
+                f_b = tf.get_variable('f_b', [dim])
+                
+                t_w = tf.get_variable('t_w', [dim, dim])
+                t_b = tf.get_variable('t_b', [dim])
+                
+                t = tf.sigmoid(tf.matmul(highway_stack[-1], t_w) + t_b)
+                f = tf.matmul(highway_stack[-1], f_w) + f_b
+                g = tf.nn.relu(f)
+                z = t * g + (1. - t) * highway_stack[-1]
+                highway_stack += [z]
+        
+        return highway_stack[-1]
     

@@ -28,7 +28,7 @@ class Network():
         self.initialize_variables()
         
         # Initialize logits
-        self.logits()
+        self.logits
         
     def initialize_variables(self):
         # For the optimizer

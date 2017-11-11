@@ -43,7 +43,7 @@ targets = tf.placeholder(tf.int64, [batch_size, input_seq_length], name='targets
 keep_prob = tf.placeholder(tf.float32)
 
 # Model
-embedder = CharacterCNNBackend(vocab_size, embedding_dim)
+embedder = CharacterCNNBackend(vocab_size, embedding_dim, max_word_length)
 network = Network(input_, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length, embedder)
 
 # Create session    

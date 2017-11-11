@@ -13,8 +13,7 @@ class CharacterCNNBackend():
         # Clear operation for 0th embedding
         self.reset_op = tf.scatter_update(self.embeddings, [0], tf.constant(0.0, shape=[1, self.embedding_dim]))
     
-    def embed_word(self, inputs):
-        max_word_length = inputs.get_shape()[1]
+    def embed_word(self, inputs, max_word_length):
         input_embedded = tf.nn.embedding_lookup(self.embeddings, inputs)
         input_embedded = tf.reshape(input_embedded, [-1, max_word_length, self.embedding_dim])
         input_embedded = tf.expand_dims(input_embedded, 1)

@@ -1,3 +1,7 @@
 .project
 .pydevproject
 src/*.pyc
+.ipynb_checkpoints/
+*.ipynb
+data/*.ipynb
+src/*.ipynb

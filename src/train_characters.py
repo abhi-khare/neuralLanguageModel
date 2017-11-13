@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import time
-from english_provider import EnglishDataProvider
+from data_provider import DataProvider
 from network import Network
 from utils import model_size
 from cnn_backend import CharacterCNNBackend
@@ -18,7 +18,7 @@ hidden_dim    = 200
 num_layers    = 2
 
 # Dataset
-eigo = EnglishDataProvider()
+eigo = DataProvider('english')
 
 vocab_size = len(eigo.get_vocabulary())
 print 'Vocabulary size:', vocab_size

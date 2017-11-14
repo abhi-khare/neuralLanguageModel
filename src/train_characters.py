@@ -8,7 +8,7 @@ from cnn_backend import CharacterCNNBackend
 from rnn_backend import CharacterRNNBackend
 import sys
 
-c2w_model = sys.argv[1]
+c2w_model = sys.argv[2]
 
 # Training
 dropout       = 0.5
@@ -27,15 +27,15 @@ else:
     kernels = [1,2,3]
 
 kernel_features = [25*x for x in kernels]
-highway_layers = sys.argv[2]
+highway_layers = sys.argv[4]
 
 # Back end RNN
 rnn_embedding_dim = 15
-rnn_hidden_dim = sys.argv[2]
+rnn_hidden_dim = sys.argv[3]
 rnn_output_dim = 200
 
 # Dataset
-eigo = DataProvider('english')
+eigo = DataProvider(sys.argv[1])
 
 vocab_size = len(eigo.get_vocabulary())
 print 'Vocabulary size:', vocab_size
@@ -85,7 +85,7 @@ rnn_state = session.run(network.initial_state)
 saver = tf.train.Saver(max_to_keep=50)
 best_filename = None
 
-os.makedirs("saves/char_cnn")
+os.makedirs("saves/"+c2w_model)
 
 for epoch in range(25):
     epoch_start_time = time.time()
@@ -148,7 +148,7 @@ for epoch in range(25):
     print "train loss = %6.8f, perplexity = %6.8f" % (avg_train_loss, np.exp(avg_train_loss))
     print "validation loss = %6.8f, perplexity = %6.8f" % (avg_valid_loss, np.exp(avg_valid_loss))
     
-    save_filename = 'saves/char/chinese_epoch%03d_%.4f.model' % (epoch, avg_valid_loss)
+    save_filename = 'saves/%s/%s_%s_%s_epoch%03d_%.4f.model' % (sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], epoch, avg_valid_loss)
     saver.save(session, save_filename)
 
     # learning rate update

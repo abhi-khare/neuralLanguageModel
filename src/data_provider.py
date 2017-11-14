@@ -7,7 +7,7 @@ class DataProvider:
         for fold in ['train', 'valid', 'test']:
             self.tokens[fold] = []
 
-            with open('../data/' + language + '/' + fold + '.txt') as f:
+            with open('data/' + language + '/' + fold + '.txt') as f:
                 for line in f:
                     line = line.strip()
                     line = line.replace('}', '').replace('{', '').replace('|', '')
@@ -27,8 +27,8 @@ class DataProvider:
                 if word not in self.word_vocab:
                     self.word_vocab += [word]
                     
-                    if len(word) > self.max_wordlen:
-                        self.max_wordlen = len(word)
+                    if len(word.decode('utf8')) > self.max_wordlen:
+                        self.max_wordlen = len(word.decode('utf8'))
                     
                     for character in list(word.decode('utf8')):
                         if character not in self.char_vocab:
@@ -64,7 +64,7 @@ class DataProvider:
     def get_char_pairs(self, fold, seq_len=35, batch_size=20):
         def lookup_word(x):
             this_word = np.zeros(self.max_wordlen + 2, np.int32)
-            this_word[:len(x) + 2] = np.array([self.reverse_alph[y] for y in '{' + x.decode('utf8') + '}'])
+            this_word[:len(x.decode('utf8')) + 2] = np.array([self.reverse_alph[y] for y in '{' + x.decode('utf8') + '}'])
             return this_word
     
         x = np.array([map(lookup_word, self.tokens[fold][i:i+seq_len]) for i in range(0, len(self.tokens[fold]) - 1, seq_len)][:-1])

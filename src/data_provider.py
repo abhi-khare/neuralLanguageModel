@@ -3,36 +3,44 @@ import numpy as np
 class DataProvider:
     def __init__(self, language):
         self.tokens = {}
-
-        for fold in ['train', 'valid', 'test']:
-            self.tokens[fold] = []
-
-            with open('data/' + language + '/' + fold + '.txt') as f:
-                for line in f:
-                    line = line.strip()
-                    line = line.replace('}', '').replace('{', '').replace('|', '')
-                    line = line.replace('<unk>', ' | ').replace('+', '')
+        try:
+            self.tokens = np.load('data/' + language + '/tokens.npy').item()
+            print('cache available')
+        except IOError:
+            for fold in ['train', 'valid', 'test']:
+                self.tokens[fold] = []
+                with open('data/' + language + '/' + fold + '.txt') as f:
+                    for line in f:
+                        line = line.strip()
+                        line = line.replace('}', '').replace('{', '').replace('|', '')
+                        line = line.replace('<unk>', ' | ').replace('+', '')
                     
-                    for word in line.split():
-                        self.tokens[fold].append(word)
+                        for word in line.split():
+                            self.tokens[fold].append(word)
 
-                    self.tokens[fold].append('+')
-            
+                        self.tokens[fold].append('+')
+       
+            np.save('data/' + language + '/tokens.npy', self.tokens)
+     
         self.word_vocab  = ['|']
         self.char_vocab  = []
         self.max_wordlen = 0
+        self.word_set = set(['|'])
+        self.char_set = set()
 
         for fold in ['train', 'valid', 'test']:
             for word in self.tokens[fold]:
-                if word not in self.word_vocab:
-                    self.word_vocab += [word]
+                if word not in self.word_set:
+                    self.word_set.add(word)
+                    self.word_vocab.append(word)
                     
                     if len(word.decode('utf8')) > self.max_wordlen:
                         self.max_wordlen = len(word.decode('utf8'))
                     
                     for character in list(word.decode('utf8')):
-                        if character not in self.char_vocab:
-                            self.char_vocab += [character]
+                        if character not in self.char_set:
+                            self.char_set.add(character)
+                            self.char_vocab.append(character)
         
         # sort the alphabet
         self.char_vocab = [' ', '{', '}', '|', '+'] + sorted(self.char_vocab)

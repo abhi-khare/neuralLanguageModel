@@ -58,7 +58,10 @@ rnn_state = session.run(network.initial_state)
 saver = tf.train.Saver(max_to_keep=50)
 best_filename = None
 
-os.makedirs("saves/words")
+try:
+    os.makedirs("saves/words")
+except OSError:
+    pass
 
 for epoch in range(25):
     epoch_start_time = time.time()

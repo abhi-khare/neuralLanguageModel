@@ -47,7 +47,7 @@ keep_prob = tf.placeholder(tf.float32)
 
 # Model
 embedder = CharacterCNNBackend(vocab_size, embedding_dim, max_word_length, kernels=kernels, kernel_features=kernel_features, highway_layers=highway_layers)
-network = Network(input_, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length, embedder)
+network = Network(input_, targets, keep_prob, batch_size, vocab_size, num_layers, hidden_dim, input_seq_length, embedder)
 
 # Create session    
 config = tf.ConfigProto()

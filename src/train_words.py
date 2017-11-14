@@ -5,6 +5,8 @@ from data_provider import DataProvider
 from network import Network
 from utils import model_size
 from word_embedding_backend import WordEmbeddingBackend
+import sys
+
 
 # Training
 dropout       = 0.5
@@ -15,10 +17,11 @@ hidden_dim    = 200
 num_layers    = 2
 
 # Back end embedding
-embedding_dim = 200
-
+#embedding_dim = 200
+embedding_dim = int(sys.argv[1])
 # Dataset
-eigo = DataProvider('chinese')
+#eigo = DataProvider('chinese')
+eigo = DataProvider(sys.argv[2])
 
 vocab_size = len(eigo.get_vocabulary())
 print 'Vocabulary size:', vocab_size
@@ -55,7 +58,10 @@ rnn_state = session.run(network.initial_state)
 saver = tf.train.Saver(max_to_keep=50)
 best_filename = None
 
-os.makedirs("saves/words")
+try:
+    os.makedirs("saves/words")
+except OSError:
+    pass
 
 for epoch in range(25):
     epoch_start_time = time.time()

@@ -50,6 +50,7 @@ session = tf.Session(config=config)
 session.run(tf.global_variables_initializer())
 session.run(embedder.reset_op)
 print 'Model size:', model_size()
+sys.stdout.flush()
 
 best_valid_loss = None
 rnn_state = session.run(network.initial_state)
@@ -96,8 +97,10 @@ for epoch in range(25):
                                                     t_loss, np.exp(t_loss),
                                                     time_elapsed,
                                                     gradient_norm)
+            sys.stdout.flush()
 
     print('Epoch training time:', time.time()-epoch_start_time)
+    sys.stdout.flush()
     
     # epoch done: time to evaluate
     avg_valid_loss = 0.0
@@ -122,7 +125,8 @@ for epoch in range(25):
     print "at the end of epoch:", epoch
     print "train loss = %6.8f, perplexity = %6.8f" % (avg_train_loss, np.exp(avg_train_loss))
     print "validation loss = %6.8f, perplexity = %6.8f" % (avg_valid_loss, np.exp(avg_valid_loss))
-    
+    sys.stdout.flush()
+
     save_filename = 'saves/words/%s_%d_epoch%03d_%.4f.model' % (sys.argv[2], embedding_dim, epoch, avg_valid_loss)
     saver.save(session, save_filename)
 
@@ -136,6 +140,7 @@ for epoch in range(25):
         
         session.run(network.learning_rate.assign(current_learning_rate))
         print 'New LR:', current_learning_rate
+        sys.stdout.flush()
     else:
         best_valid_loss = avg_valid_loss
         best_filename = save_filename
@@ -143,6 +148,7 @@ for epoch in range(25):
 # Load the best performing model
 saver.restore(session, best_filename)
 print "restoring saved model", best_filename
+sys.stdout.flush()
 
 # Test the model
 rnn_state = session.run(network.initial_state)
@@ -168,5 +174,6 @@ for i in range(0, len(test_x) - batch_size, batch_size):
 
 print "test loss = %6.8f, perplexity = %6.8f" % (avg_test_loss, np.exp(avg_test_loss))
 print "test samples:", count * batch_size
+sys.stdout.flush()
         
 session.close()

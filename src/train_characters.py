@@ -53,6 +53,7 @@ print 'Sequence length:', input_seq_length
 
 max_word_length = len(train_x[0][0])
 print 'Maximum word length:', max_word_length
+sys.stdout.flush()
 
 # Placeholders
 input_ = tf.placeholder(tf.int32, shape=[batch_size, input_seq_length, max_word_length], name="input")
@@ -67,6 +68,7 @@ elif c2w_model == 'rnn':
     embedder = CharacterRNNBackend(vocab_size, rnn_embedding_dim, max_word_length, rnn_hidden_dim, keep_prob, rnn_output_dim, batch_size)
     print rnn_hidden_dim
 
+sys.stdout.flush()
 network = Network(input_, targets, keep_prob, batch_size, vocab_size, num_layers, hidden_dim, input_seq_length, embedder)
 
 # Create session    
@@ -124,9 +126,11 @@ for epoch in range(25):
                                                     t_loss, np.exp(t_loss),
                                                     time_elapsed,
                                                     gradient_norm)
+            sys.stdout.flush()
 
     print('Epoch training time:', time.time()-epoch_start_time)
-    
+    sys.stdout.flush()
+
     # epoch done: time to evaluate
     avg_valid_loss = 0.0
     count = 0
@@ -150,7 +154,8 @@ for epoch in range(25):
     print "at the end of epoch:", epoch
     print "train loss = %6.8f, perplexity = %6.8f" % (avg_train_loss, np.exp(avg_train_loss))
     print "validation loss = %6.8f, perplexity = %6.8f" % (avg_valid_loss, np.exp(avg_valid_loss))
-    
+    sys.stdout.flush()
+ 
     save_filename = 'saves/%s/%s_%s_%s_epoch%03d_%.4f.model' % (sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], epoch, avg_valid_loss)
     saver.save(session, save_filename)
 
@@ -164,6 +169,7 @@ for epoch in range(25):
         
         session.run(network.learning_rate.assign(current_learning_rate))
         print 'New LR:', current_learning_rate
+        sys.stdout.flush()
     else:
         best_valid_loss = avg_valid_loss
         best_filename = save_filename        
@@ -171,6 +177,7 @@ for epoch in range(25):
 # Load the best performing model
 saver.restore(session, best_filename)
 print "restoring saved model", best_filename
+sys.stdout.flush()
 
 # Test the model
 rnn_state = session.run(network.initial_state)
@@ -196,5 +203,6 @@ for i in range(0, len(test_x) - batch_size, batch_size):
 
 print "test loss = %6.8f, perplexity = %6.8f" % (avg_test_loss, np.exp(avg_test_loss))
 print "test samples:", count * batch_size
+sys.stdout.flush()
 
 session.close()

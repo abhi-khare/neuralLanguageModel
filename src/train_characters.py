@@ -30,7 +30,7 @@ kernel_features = [25*x for x in kernels]
 highway_layers = int(sys.argv[4])
 
 # Back end RNN
-rnn_embedding_dim = 15
+rnn_embedding_dim = 200
 
 try:
     rnn_hidden_dim = int(sys.argv[3])

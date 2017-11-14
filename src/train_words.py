@@ -136,8 +136,8 @@ for epoch in range(25):
         best_filename = save_filename
 
 # Load the best performing model
-saver.restore(session, save_filename)
-print "restoring saved model", save_filename
+saver.restore(session, best_filename)
+print "restoring saved model", best_filename
 
 # Test the model
 rnn_state = session.run(network.initial_state)
@@ -153,8 +153,8 @@ for i in range(0, len(test_x) - batch_size, batch_size):
         network.loss,
         network.rnn_final_state
     ], {
-        input_ : valid_x[i:i+batch_size],
-        targets: valid_y[i:i+batch_size],
+        input_ : test_x[i:i+batch_size],
+        targets: test_y[i:i+batch_size],
         network.initial_state: rnn_state,
         keep_prob: 1.0
     })

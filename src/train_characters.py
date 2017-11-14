@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-import time
+import time, os
 from data_provider import DataProvider
 from network import Network
 from utils import model_size
@@ -63,6 +63,9 @@ best_valid_loss = None
 rnn_state = session.run(network.initial_state)
 
 saver = tf.train.Saver(max_to_keep=50)
+best_filename = None
+
+os.makedirs("saves/char_cnn")
 
 for epoch in range(25):
     epoch_start_time = time.time()
@@ -124,6 +127,9 @@ for epoch in range(25):
     print "at the end of epoch:", epoch
     print "train loss = %6.8f, perplexity = %6.8f" % (avg_train_loss, np.exp(avg_train_loss))
     print "validation loss = %6.8f, perplexity = %6.8f" % (avg_valid_loss, np.exp(avg_valid_loss))
+    
+    save_filename = 'saves/char_cnn/chinese_%d_epoch%03d_%.4f.model' % (embedding_dim, epoch, avg_valid_loss)
+    saver.save(session, save_filename)
 
     # learning rate update
     if best_valid_loss is not None and np.exp(avg_valid_loss) > np.exp(best_valid_loss) - 1.0:
@@ -137,6 +143,35 @@ for epoch in range(25):
         print 'New LR:', current_learning_rate
     else:
         best_valid_loss = avg_valid_loss
-        
-        
+        best_filename = save_filename        
+
+# Load the best performing model
+saver.restore(session, best_filename)
+print "restoring saved model", best_filename
+
+# Test the model
+rnn_state = session.run(network.initial_state)
+
+count = 0
+avg_test_loss = 0
+start_time = time.time()
+
+for i in range(0, len(test_x) - batch_size, batch_size):
+    count += 1
+
+    t_loss, rnn_state = session.run([
+        network.loss,
+        network.rnn_final_state
+    ], {
+        input_ : test_x[i:i+batch_size],
+        targets: test_y[i:i+batch_size],
+        network.initial_state: rnn_state,
+        keep_prob: 1.0
+    })
+    
+    avg_test_loss += t_loss / (len(test_x)/batch_size)
+
+print "test loss = %6.8f, perplexity = %6.8f" % (avg_test_loss, np.exp(avg_test_loss))
+print "test samples:", count * batch_size
+
 session.close()

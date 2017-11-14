@@ -21,7 +21,7 @@ kernel_features = [25,50,75,100,125,150]
 highway_layers = 1
 
 # Dataset
-eigo = DataProvider('english')
+eigo = DataProvider('chinese')
 
 vocab_size = len(eigo.get_vocabulary())
 print 'Vocabulary size:', vocab_size

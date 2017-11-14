@@ -16,7 +16,7 @@ num_layers    = 2
 
 # Back end CNN
 embedding_dim = 15
-kernels=[1,2,3,4,5,6]
+kernels = [1,2,3,4,5,6]
 kernel_features = [25,50,75,100,125,150]
 highway_layers = 1
 

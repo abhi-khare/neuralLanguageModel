@@ -5,6 +5,8 @@ from data_provider import DataProvider
 from network import Network
 from utils import model_size
 from word_embedding_backend import WordEmbeddingBackend
+import sys
+
 
 # Training
 dropout       = 0.5
@@ -15,10 +17,11 @@ hidden_dim    = 200
 num_layers    = 2
 
 # Back end embedding
-embedding_dim = 200
-
+#embedding_dim = 200
+embedding_dim = int(sys.argv[1])
 # Dataset
-eigo = DataProvider('chinese')
+#eigo = DataProvider('chinese')
+eigo = DataProvider(sys.argv[2])
 
 vocab_size = len(eigo.get_vocabulary())
 print 'Vocabulary size:', vocab_size

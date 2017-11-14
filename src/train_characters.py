@@ -10,12 +10,15 @@ from cnn_backend import CharacterCNNBackend
 dropout       = 0.5
 batch_size    = 20
 
-# Embedding
-embedding_dim = 200
-
-# RNN
+# Front end RNN
 hidden_dim    = 200
 num_layers    = 2
+
+# Back end CNN
+embedding_dim = 15
+kernels=[1,2,3,4,5,6]
+kernel_features = [25,50,75,100,125,150]
+highway_layers = 1
 
 # Dataset
 eigo = DataProvider('english')
@@ -43,7 +46,7 @@ targets = tf.placeholder(tf.int64, [batch_size, input_seq_length], name='targets
 keep_prob = tf.placeholder(tf.float32)
 
 # Model
-embedder = CharacterCNNBackend(vocab_size, embedding_dim, max_word_length)
+embedder = CharacterCNNBackend(vocab_size, embedding_dim, max_word_length, kernels=kernels, kernel_features=kernel_features, highway_layers=highway_layers)
 network = Network(input_, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length, embedder)
 
 # Create session    

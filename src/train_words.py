@@ -10,12 +10,12 @@ from word_embedding_backend import WordEmbeddingBackend
 dropout       = 0.5
 batch_size    = 20
 
-# Embedding
-embedding_dim = 200
-
-# RNN
+# Front end RNN
 hidden_dim    = 200
 num_layers    = 2
+
+# Back end embedding
+embedding_dim = 200
 
 # Dataset
 eigo = DataProvider('english')
@@ -37,7 +37,7 @@ keep_prob = tf.placeholder(tf.float32)
 
 # Model
 embedder = WordEmbeddingBackend(vocab_size, embedding_dim)
-network = Network(input_, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, input_seq_length, embedder)
+network = Network(input_, targets, keep_prob, batch_size, vocab_size, num_layers, hidden_dim, input_seq_length, embedder)
 
 # Create session    
 config = tf.ConfigProto()

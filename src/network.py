@@ -5,7 +5,7 @@ class Network():
     INITIAL_LR = 1.0
     MAX_GRAD_NORM = 5.0
     
-    def __init__(self, inputs, targets, keep_prob, batch_size, vocab_size, embedding_dim, num_layers, hidden_dim, sequence_length, embedder):
+    def __init__(self, inputs, targets, keep_prob, batch_size, vocab_size, num_layers, hidden_dim, sequence_length, embedder):
         # Set the placeholders
         self.inputs = inputs
         self.targets = targets
@@ -20,7 +20,6 @@ class Network():
         self.sequence_length = sequence_length
         
         # Set the hyperparameters
-        self.embedding_dim = embedding_dim
         self.num_layers = num_layers
         self.hidden_dim = hidden_dim
         

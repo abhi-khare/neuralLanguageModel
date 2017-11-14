@@ -18,7 +18,7 @@ num_layers    = 2
 embedding_dim = 200
 
 # Dataset
-eigo = DataProvider('english')
+eigo = DataProvider('chinese')
 
 vocab_size = len(eigo.get_vocabulary())
 print 'Vocabulary size:', vocab_size

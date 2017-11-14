@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 class CharacterCNNBackend():
-    def __init__(self, vocab_size, embedding_dim, max_word_length, kernels=[1,2,3,4,5,6], kernel_features = [25,50,75,100,125,150], highway_layers=1):
+    def __init__(self, vocab_size, embedding_dim, max_word_length, kernels, kernel_features, highway_layers):
         self.vocab_size = vocab_size
         self.embedding_dim = embedding_dim
         self.max_word_length = max_word_length

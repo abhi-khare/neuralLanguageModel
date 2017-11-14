@@ -5,6 +5,9 @@ from data_provider import DataProvider
 from network import Network
 from utils import model_size
 from cnn_backend import CharacterCNNBackend
+from rnn_backend import CharacterRNNBackend
+
+c2w_model = 'rnn'
 
 # Training
 dropout       = 0.5
@@ -15,13 +18,18 @@ hidden_dim    = 200
 num_layers    = 2
 
 # Back end CNN
-embedding_dim = 15
+cnn_embedding_dim = 15
 kernels = [1,2,3,4,5,6]
 kernel_features = [25,50,75,100,125,150]
 highway_layers = 1
 
+# Back end RNN
+rnn_embedding_dim = 15
+rnn_hidden_dim = 200
+rnn_output_dim = 200
+
 # Dataset
-eigo = DataProvider('chinese')
+eigo = DataProvider('english')
 
 vocab_size = len(eigo.get_vocabulary())
 print 'Vocabulary size:', vocab_size
@@ -46,7 +54,11 @@ targets = tf.placeholder(tf.int64, [batch_size, input_seq_length], name='targets
 keep_prob = tf.placeholder(tf.float32)
 
 # Model
-embedder = CharacterCNNBackend(vocab_size, embedding_dim, max_word_length, kernels=kernels, kernel_features=kernel_features, highway_layers=highway_layers)
+if c2w_model == 'cnn':
+    embedder = CharacterCNNBackend(vocab_size, cnn_embedding_dim, max_word_length, kernels, kernel_features, highway_layers)
+elif c2w_model == 'rnn':
+    embedder = CharacterRNNBackend(vocab_size, rnn_embedding_dim, max_word_length, rnn_hidden_dim, keep_prob, rnn_output_dim, batch_size)
+
 network = Network(input_, targets, keep_prob, batch_size, vocab_size, num_layers, hidden_dim, input_seq_length, embedder)
 
 # Create session    
@@ -128,7 +140,7 @@ for epoch in range(25):
     print "train loss = %6.8f, perplexity = %6.8f" % (avg_train_loss, np.exp(avg_train_loss))
     print "validation loss = %6.8f, perplexity = %6.8f" % (avg_valid_loss, np.exp(avg_valid_loss))
     
-    save_filename = 'saves/char_cnn/chinese_%d_epoch%03d_%.4f.model' % (embedding_dim, epoch, avg_valid_loss)
+    save_filename = 'saves/char/chinese_epoch%03d_%.4f.model' % (epoch, avg_valid_loss)
     saver.save(session, save_filename)
 
     # learning rate update

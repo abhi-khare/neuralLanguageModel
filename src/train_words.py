@@ -17,10 +17,9 @@ hidden_dim    = 200
 num_layers    = 2
 
 # Back end embedding
-#embedding_dim = 200
 embedding_dim = int(sys.argv[1])
+
 # Dataset
-#eigo = DataProvider('chinese')
 eigo = DataProvider(sys.argv[2])
 
 vocab_size = len(eigo.get_vocabulary())
@@ -55,7 +54,7 @@ print 'Model size:', model_size()
 best_valid_loss = None
 rnn_state = session.run(network.initial_state)
 
-saver = tf.train.Saver(max_to_keep=50)
+saver = tf.train.Saver(max_to_keep=5000)
 best_filename = None
 
 try:
@@ -124,7 +123,7 @@ for epoch in range(25):
     print "train loss = %6.8f, perplexity = %6.8f" % (avg_train_loss, np.exp(avg_train_loss))
     print "validation loss = %6.8f, perplexity = %6.8f" % (avg_valid_loss, np.exp(avg_valid_loss))
     
-    save_filename = 'saves/words/chinese_%d_epoch%03d_%.4f.model' % (embedding_dim, epoch, avg_valid_loss)
+    save_filename = 'saves/words/%s_%d_epoch%03d_%.4f.model' % (sys.argv[2], embedding_dim, epoch, avg_valid_loss)
     saver.save(session, save_filename)
 
     # learning rate update

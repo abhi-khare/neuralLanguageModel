@@ -27,11 +27,11 @@ else:
     kernels = [1,2,3]
 
 kernel_features = [25*x for x in kernels]
-highway_layers = sys.argv[4]
+highway_layers = int(sys.argv[4])
 
 # Back end RNN
 rnn_embedding_dim = 15
-rnn_hidden_dim = sys.argv[3]
+rnn_hidden_dim = int(sys.argv[3])
 rnn_output_dim = 200
 
 # Dataset
@@ -82,10 +82,13 @@ print 'Model size:', model_size()
 best_valid_loss = None
 rnn_state = session.run(network.initial_state)
 
-saver = tf.train.Saver(max_to_keep=50)
+saver = tf.train.Saver(max_to_keep=5000)
 best_filename = None
 
-os.makedirs("saves/"+c2w_model)
+try:
+    os.makedirs("saves/"+c2w_model)
+except OSError:
+    pass
 
 for epoch in range(25):
     epoch_start_time = time.time()

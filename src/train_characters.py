@@ -6,8 +6,9 @@ from network import Network
 from utils import model_size
 from cnn_backend import CharacterCNNBackend
 from rnn_backend import CharacterRNNBackend
+import sys
 
-c2w_model = 'rnn'
+c2w_model = sys.argv[1]
 
 # Training
 dropout       = 0.5
@@ -19,13 +20,18 @@ num_layers    = 2
 
 # Back end CNN
 cnn_embedding_dim = 15
-kernels = [1,2,3,4,5,6]
-kernel_features = [25,50,75,100,125,150]
-highway_layers = 1
+
+if sys.argv[3]=='large':
+    kernels = [1,2,3,4,5,6]
+else:
+    kernels = [1,2,3]
+
+kernel_features = [25*x for x in kernels]
+highway_layers = sys.argv[2]
 
 # Back end RNN
 rnn_embedding_dim = 15
-rnn_hidden_dim = 200
+rnn_hidden_dim = sys.argv[2]
 rnn_output_dim = 200
 
 # Dataset
@@ -56,8 +62,10 @@ keep_prob = tf.placeholder(tf.float32)
 # Model
 if c2w_model == 'cnn':
     embedder = CharacterCNNBackend(vocab_size, cnn_embedding_dim, max_word_length, kernels, kernel_features, highway_layers)
+    print kernels, kernel_features, highway_layers
 elif c2w_model == 'rnn':
     embedder = CharacterRNNBackend(vocab_size, rnn_embedding_dim, max_word_length, rnn_hidden_dim, keep_prob, rnn_output_dim, batch_size)
+    print rnn_hidden_dim
 
 network = Network(input_, targets, keep_prob, batch_size, vocab_size, num_layers, hidden_dim, input_seq_length, embedder)
 

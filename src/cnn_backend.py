@@ -51,7 +51,7 @@ class CharacterCNNBackend():
                 t_w = tf.get_variable('t_w', [dim, dim])
                 t_b = tf.get_variable('t_b', [dim])
                 
-                t = tf.sigmoid(tf.matmul(highway_stack[-1], t_w) + t_b)
+                t = tf.sigmoid(tf.matmul(highway_stack[-1], t_w) + t_b - 2.0)
                 f = tf.matmul(highway_stack[-1], f_w) + f_b
                 g = tf.nn.relu(f)
                 z = t * g + (1. - t) * highway_stack[-1]

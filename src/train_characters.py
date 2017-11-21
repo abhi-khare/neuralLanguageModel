@@ -30,8 +30,13 @@ kernel_features = [25*x for x in kernels]
 highway_layers = int(sys.argv[4])
 
 # Back end RNN
-rnn_embedding_dim = 15
-rnn_hidden_dim = int(sys.argv[3])
+rnn_embedding_dim = 200
+
+try:
+    rnn_hidden_dim = int(sys.argv[3])
+except:
+    rnn_hidden_dim = None
+
 rnn_output_dim = 200
 
 # Dataset
@@ -61,15 +66,16 @@ targets = tf.placeholder(tf.int64, [batch_size, input_seq_length], name='targets
 keep_prob = tf.placeholder(tf.float32)
 
 # Model
-if c2w_model == 'cnn':
-    embedder = CharacterCNNBackend(vocab_size, cnn_embedding_dim, max_word_length, kernels, kernel_features, highway_layers)
-    print kernels, kernel_features, highway_layers
-elif c2w_model == 'rnn':
-    embedder = CharacterRNNBackend(vocab_size, rnn_embedding_dim, max_word_length, rnn_hidden_dim, keep_prob, rnn_output_dim, batch_size)
-    print rnn_hidden_dim
+with tf.variable_scope("Model", initializer=tf.random_uniform_initializer(-0.05, 0.05)):
+    if c2w_model == 'cnn':
+        embedder = CharacterCNNBackend(vocab_size, cnn_embedding_dim, max_word_length, kernels, kernel_features, highway_layers)
+        print kernels, kernel_features, highway_layers
+    elif c2w_model == 'rnn':
+        embedder = CharacterRNNBackend(vocab_size, rnn_embedding_dim, max_word_length, rnn_hidden_dim, keep_prob, rnn_output_dim, batch_size)
+        print rnn_hidden_dim
 
-sys.stdout.flush()
-network = Network(input_, targets, keep_prob, batch_size, vocab_size, num_layers, hidden_dim, input_seq_length, embedder)
+    sys.stdout.flush()
+    network = Network(input_, targets, keep_prob, batch_size, vocab_size, num_layers, hidden_dim, input_seq_length, embedder)
 
 # Create session    
 config = tf.ConfigProto()
